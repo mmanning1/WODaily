@@ -2,6 +2,9 @@
 
 A tool to track crossfit style workouts.
 
+Workouts are shown in a scrollable list and organized by month where you can easily add/update.
+
+
 ## Getting Started
 
 This project is a starting point for a Flutter application.
