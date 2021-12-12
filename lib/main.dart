@@ -1,0 +1,207 @@
+import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:intl/intl.dart';
+import 'package:WODaily/screens/enter_screen.dart';
+import 'package:WODaily/utils/db_helper_util.dart';
+import 'model/wodclass.dart';
+import 'screens/edit_screen.dart';
+
+
+void main() {
+  runApp(MyApp());
+}
+
+class MyApp extends StatelessWidget {
+  // This widget is the root of your application.
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      title: 'WODaily',
+      debugShowCheckedModeBanner: false,
+      home: WodHome(),
+    );
+  }
+}
+
+class WodHome extends StatefulWidget {
+
+  @override
+  _WodHomeState createState() => _WodHomeState();
+}
+
+class _WodHomeState extends State<WodHome> {
+  final List<Wod>_wodList=<Wod>[];
+  int _month = DateTime.now().month;
+  var db=DatabaseHelper();
+
+  @override
+  void initState(){
+    super.initState();
+    getData();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text("WODaily"),
+        centerTitle: true,
+        actions: <Widget>[
+          PopupMenuButton<String>(
+            icon: const Icon(FontAwesomeIcons.bars),
+            onSelected: handleClick,
+            itemBuilder: (BuildContext context) {
+              return {'Logout', 'Settings','Timer'}.map((String choice) {
+                return PopupMenuItem<String>(
+                  value: choice,
+                  child: Text(choice),
+                );
+              }).toList();
+            },
+          )
+        ],
+        backgroundColor: Colors.blue.shade900,
+      ),
+      body: Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.start,
+          children: <Widget>[
+            Row(
+              children: <Widget>[
+                IconButton(
+                  onPressed: () {
+                    setState(() {
+                      _month = (_month == 1) ? 12 : _month-1;
+                      getData();
+                    });
+                  },
+                  icon: const Icon(FontAwesomeIcons.angleDoubleLeft),
+                ),
+                Expanded(
+                  child: Text(DateFormat('MMMM').format(DateTime(0,_month)),
+                    textAlign: TextAlign.center,
+                    textScaleFactor: 2),
+                ),
+                IconButton(
+                  onPressed: () {
+                    setState(() {
+                      _month = (_month == 12) ? 1 : _month+1;
+                      getData();
+                    });
+                  },
+                  icon: const Icon(FontAwesomeIcons.angleDoubleRight),
+                ),
+              ],
+
+            ),
+            Expanded(
+                child: ListView.builder(
+                itemCount: _wodList.length,
+                scrollDirection: Axis.vertical,
+                shrinkWrap: true,
+                itemBuilder: (BuildContext context,int index){
+                  return Card(
+                    color:Colors.blue.shade900,
+                    elevation: 5,
+                    margin: EdgeInsets.all(3),
+                    shape:const OutlineInputBorder(
+                        borderRadius: BorderRadius.only(topLeft:Radius.circular(10.0),
+                        topRight: Radius.circular(10.0),
+                        bottomLeft: Radius.circular(10)
+                      )
+                    ),
+                    child: ListTile(
+                      // Might not need the year here if we are showing monthly
+                      title: Text(DateFormat('MM/dd/yy').format(DateTime.parse(_wodList[index].date)),
+                        style:  const TextStyle(color: Colors.white,fontSize: 20.0),),
+                      subtitle: Text(_wodList[index].type + ': ' + _wodList[index].description,
+                        style:  const TextStyle(color: Colors.white,fontSize: 10.0),),
+                      trailing: Text(_wodList[index].score,
+                        style:  const TextStyle(color: Colors.white)),
+                      onTap: () async {
+                        final Wod editedWod = await Navigator.push(context,MaterialPageRoute(
+                            builder: (context) => EditWodScreen(workout: _wodList[index], index: index)
+                        ));
+                        setState(() {
+                          if (editedWod != null) {
+                            _wodList[index] = editedWod;
+                          }
+                        });
+                      },
+                      onLongPress: () => showDialog<String>(
+                        context: context,
+                        builder: (BuildContext) => AlertDialog(
+                          title: const Text("Delete Workout?"),
+                          actions: <Widget>[
+                            TextButton(
+                              onPressed: () {
+                                Navigator.pop(context, 'Delete');
+                                _delete(_wodList[index].id,index);
+                              },
+                              child: const Text('Delete'),
+                            ),
+                            TextButton(
+                              onPressed: () => Navigator.pop(context, 'Cancel'),
+                              child: const Text('Cancel'),
+                            ),
+                          ],
+                        )
+                      )
+                    ),
+                  );
+                }
+              )
+            ),
+          ],
+        ),
+      ),
+      floatingActionButton: FloatingActionButton(
+      backgroundColor: Colors.blue.shade900,
+      child: const Icon(Icons.add),
+      tooltip: "Add",
+      elevation: 10,
+      onPressed:() async {
+        final Wod newWod = await Navigator.push(context, MaterialPageRoute(
+              builder: (context) => EnterWodScreen()
+        ));
+        setState(() {
+          // In case they pressed cancel
+          if (newWod != null) {
+            //In case they entered a workout for a different month
+            if (DateFormat('yyyy-MM-dd').parse(newWod.date).month == _month) {
+              _wodList.insert(0, newWod);
+            }
+          }
+        });
+      }
+    ),
+    );
+  }
+
+  getData() async {
+    // Will have to incorporate year here eventually to
+    // prevent past years data from populating into current year
+    _wodList.clear();
+    print('Getting data for month: $_month');
+    List wods = await db.getMonthData(_month);
+    for (var element in wods) {
+      setState(() {
+        //print('Populating list with: ' + element.toString());
+        _wodList.add(Wod.fromMap(element));
+      });
+    }
+  }
+
+  void _delete(int id, int index) async {
+    print('Deleting wod with id: $id');
+    db.deleteItem(id);
+    setState(() {
+      _wodList.removeAt(index);
+    });
+  }
+
+  void handleClick(String value) {
+    // Todo: app bar menu
+  }
+}
