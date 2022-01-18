@@ -145,7 +145,7 @@ class _WodHomeState extends State<WodHome> {
         ),
       ),
       floatingActionButton: FloatingActionButton(
-          backgroundColor: Colors.blue.shade900,
+          backgroundColor: Colors.blue.shade600,
           child: const Icon(Icons.add),
           tooltip: "Add",
           elevation: 10,

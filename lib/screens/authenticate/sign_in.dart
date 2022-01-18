@@ -4,6 +4,7 @@ import 'package:WODaily/services/auth.dart';
 import 'package:WODaily/shared/constants.dart';
 import 'package:WODaily/shared/loading.dart';
 import 'package:flutter/material.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
 class SignIn extends StatefulWidget {
   @override
@@ -26,6 +27,7 @@ class _SignInState extends State<SignIn> {
         title: const Text('Sign In'),
         backgroundColor: Colors.blue.shade900,
       ),
+      resizeToAvoidBottomInset: false, // prevents overflow
       body: Container(
         padding: EdgeInsets.symmetric(vertical: 20.0, horizontal: 50.0),
         child: Form(
@@ -99,10 +101,30 @@ class _SignInState extends State<SignIn> {
                   )
                 ],
               ),
+              const SizedBox(height: 30,),
+              ElevatedButton.icon(
+                  style: ElevatedButton.styleFrom(
+                      primary: Colors.white54,
+                      onPrimary: Colors.black,
+                      minimumSize: Size(double.infinity, 50)
+                  ),
+                  icon: FaIcon(FontAwesomeIcons.google,color: Colors.redAccent,),
+                  onPressed: () async {
+                    setState(() => _loading = true);
+                    dynamic result = await _auth.signInGoogle();
+                    if(result==null){
+                      setState(() {
+                        error = 'Could not sign into Google';
+                        _loading = false;
+                      });
+                    }
+                  },
+                  label: Text("Sign in with Google")
+              ),
               Text(
                 error,
                 style: TextStyle(color: Colors.red, fontSize: 14.0),
-              )
+              ),
             ],
           ),
         ),

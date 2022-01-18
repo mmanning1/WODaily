@@ -1,9 +1,11 @@
 
 import 'package:WODaily/model/user.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:google_sign_in/google_sign_in.dart';
 
 class AuthService {
 
+  final googleSignIn = GoogleSignIn();
   final FirebaseAuth _auth = FirebaseAuth.instance;
 
   // Get our local user rather than a firebase user object
@@ -17,18 +19,6 @@ class AuthService {
     return _auth.authStateChanges()
         //.map((User user) => _userFromFirebase(user));
         .map(_userFromFirebase);
-  }
-
-  //sign in anon?
-  Future signInAnon() async {
-    try{
-      UserCredential result = await _auth.signInAnonymously();
-      User user = result.user;
-      return user;
-    } catch(e) {
-      print(e.toString());
-      return null;
-    }
   }
 
   //sign in with email and pw
@@ -58,6 +48,24 @@ class AuthService {
     } catch (e){
       print(e.toString());
       return null;
+    }
+  }
+
+  Future signInGoogle() async {
+    try{
+      final googleUser = await googleSignIn.signIn();
+      if (googleUser==null) return;
+      final googleAuth = await googleUser.authentication;
+
+      final credential = GoogleAuthProvider.credential(
+        accessToken: googleAuth.accessToken,
+        idToken: googleAuth.idToken,
+      );
+
+      UserCredential firebaseGoogleUser = await _auth.signInWithCredential(credential);
+      return _userFromFirebase(firebaseGoogleUser.user);
+    } catch(e) {
+      print(e.toString());
     }
   }
 
