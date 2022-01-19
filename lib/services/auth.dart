@@ -1,5 +1,5 @@
-
 import 'package:WODaily/model/user.dart';
+import 'package:WODaily/services/database.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 
@@ -9,9 +9,15 @@ class AuthService {
   final FirebaseAuth _auth = FirebaseAuth.instance;
 
   // Get our local user rather than a firebase user object
-  // do we need this??
   WodUser _userFromFirebase(User firebaseUser){
-    return firebaseUser != null ? WodUser(uid: firebaseUser.uid, email: firebaseUser.email) : null;
+    if(firebaseUser != null){
+      String name = firebaseUser.displayName;
+      String first = name.substring(0,name.indexOf(' '));
+      String last = name.substring(name.indexOf(' ')).trim();
+      return WodUser(uid: firebaseUser.uid, firstName: first, lastName: last, email: firebaseUser.email);
+    } else {
+      return null;
+    }
   }
 
   //auth change stream
@@ -32,9 +38,19 @@ class AuthService {
   }
 
   //register
-  Future register(String email, String password) async {
+  Future register(String email, String password, String lastNm, String firstNm) async {
     try{
       UserCredential firebaseUser = await _auth.createUserWithEmailAndPassword(email: email, password: password);
+      User user = firebaseUser.user;
+      user.updateDisplayName(firstNm + ' ' + lastNm);
+
+      //need to reload to print details
+      //await user.reload();
+      //user = await _auth.currentUser;
+
+      //create user in firestore db
+      await DatabaseService(uid: user.uid).updateUserData(lastNm, firstNm);
+
       return _userFromFirebase(firebaseUser.user);
     }catch(e){
       print(e.toString());
@@ -63,6 +79,13 @@ class AuthService {
       );
 
       UserCredential firebaseGoogleUser = await _auth.signInWithCredential(credential);
+
+      String name = googleUser.displayName;
+      String first = name.substring(0,name.indexOf(' '));
+      String last = name.substring(name.indexOf(' ')).trim();
+
+      await DatabaseService(uid: firebaseGoogleUser.user.uid).updateUserData(last, first);
+
       return _userFromFirebase(firebaseGoogleUser.user);
     } catch(e) {
       print(e.toString());

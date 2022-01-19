@@ -17,6 +17,8 @@ class _RegisterState extends State<Register> {
   final AuthService _auth = AuthService();
   final _formkey = GlobalKey<FormState>();
   bool _loading = false;
+  String firstnm = '';
+  String lastnm = '';
   String email = '';
   String password = '';
   String error = '';
@@ -28,13 +30,31 @@ class _RegisterState extends State<Register> {
         title: const Text('Sign up'),
         backgroundColor: Colors.blue.shade900,
       ),
+      resizeToAvoidBottomInset: false, // prevents overflow
       body: Container(
         padding: EdgeInsets.symmetric(vertical: 20.0, horizontal: 50.0),
         child: Form(
           key: _formkey,
           child: Column(
             children: [
-              SizedBox(height: 20.0),
+              TextFormField(
+                decoration: textInputDecoration.copyWith(hintText: 'First Name'),
+                validator: (val) => val==null ? "Enter you last name" : null,
+                onChanged: (val){
+                  setState(() {
+                    return firstnm = val;
+                  });
+                },
+              ),
+              TextFormField(
+                decoration: textInputDecoration.copyWith(hintText: 'Last Name'),
+                validator: (val) => val==null ? "Enter you last name" : null,
+                onChanged: (val){
+                  setState(() {
+                    return lastnm = val;
+                  });
+                },
+              ),
               TextFormField(
                 // Username/email
                 decoration: textInputDecoration.copyWith(hintText: 'Email'),
@@ -55,7 +75,6 @@ class _RegisterState extends State<Register> {
                   });
                 },
               ),
-              SizedBox(height: 20.0),
               TextFormField(
                 //password
                 decoration: textInputDecoration.copyWith(hintText: 'Password'),
@@ -77,7 +96,7 @@ class _RegisterState extends State<Register> {
                       setState(() => _loading = true);
                       print('Email: ' + email);
                       print('Password: ' + password);
-                      dynamic result = await _auth.register(email, password);
+                      dynamic result = await _auth.register(email, password, lastnm, firstnm);
                       if(result==null){
                         setState(() {
                           error = 'Please supply a valid email';

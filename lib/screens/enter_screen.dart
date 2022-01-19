@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import 'package:WODaily/model/wodclass.dart';
+import 'package:WODaily/model/workout.dart';
 import 'package:WODaily/utils/db_helper_util.dart';
 
 class EnterWodScreen extends StatefulWidget {

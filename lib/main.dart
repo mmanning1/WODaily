@@ -10,7 +10,7 @@ import 'package:WODaily/screens/enter_screen.dart';
 import 'package:WODaily/utils/db_helper_util.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:provider/provider.dart';
-import 'model/wodclass.dart';
+import 'model/workout.dart';
 import 'screens/edit_screen.dart';
 
 
