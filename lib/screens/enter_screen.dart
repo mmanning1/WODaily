@@ -1,6 +1,7 @@
+import 'package:WODaily/shared/constants.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import 'package:WODaily/model/wodclass.dart';
+import 'package:WODaily/model/workout.dart';
 import 'package:WODaily/utils/db_helper_util.dart';
 
 class EnterWodScreen extends StatefulWidget {
@@ -40,7 +41,6 @@ class _EnterWodScreenState extends State<EnterWodScreen>{
         resizeToAvoidBottomInset: false,
         appBar: AppBar(
           title: const Text('New Workout'),
-          backgroundColor: Colors.blue.shade900,
         ),
         body: Container(
           child: Padding(
@@ -62,7 +62,9 @@ class _EnterWodScreenState extends State<EnterWodScreen>{
                         // Show Date Picker Here
                         await _selectDate(context);
                         // Needs to be 2012-02-27
-                        _dateController.text = DateFormat('yyyy-MM-dd').format(date);
+                        if (date != null) {
+                          _dateController.text = DateFormat('yyyy-MM-dd').format(date);
+                        }
                         //setState(() {});
                       },
                       validator: (value) {
@@ -75,14 +77,7 @@ class _EnterWodScreenState extends State<EnterWodScreen>{
                         _dateController.text = value;
                       },
                       textInputAction: TextInputAction.next,
-                      decoration: InputDecoration(
-                          contentPadding: const EdgeInsets.fromLTRB(10, 15, 20, 15),
-                          hintText: "Date",
-                          labelText: "Date",
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(10),
-                          )
-                      ),
+                      decoration: workoutFormDecoration.copyWith(labelText: 'Date'),
                     ),
 
                     //Type
@@ -90,7 +85,7 @@ class _EnterWodScreenState extends State<EnterWodScreen>{
                     DropdownButtonFormField(
                       alignment: AlignmentDirectional.center,
                       value: dropdownValue,
-                      items: ['Select One','AMRAP','EMOM','For time','For weight','Chipper','Ladder','Tabata'].map((String value) {
+                      items: wodTypes.map((String value) {
                         return DropdownMenuItem<String>(
                           value: value,
                           child: Text(value),
@@ -101,12 +96,7 @@ class _EnterWodScreenState extends State<EnterWodScreen>{
                           dropdownValue = value;
                         });
                       },
-                      decoration: InputDecoration(
-                          contentPadding: const EdgeInsets.fromLTRB(10, 15, 20, 15),
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(10),
-                          )
-                      ),
+                        decoration: workoutFormDecoration.copyWith(labelText: 'Type'),
                     ),
 
                     //Description
@@ -126,14 +116,7 @@ class _EnterWodScreenState extends State<EnterWodScreen>{
                         _descriptionController.text = value;
                       },
                       textInputAction: TextInputAction.newline,
-                      decoration: InputDecoration(
-                          contentPadding: const EdgeInsets.fromLTRB(10, 15, 20, 15),
-                          hintText: "Description",
-                          labelText: "Description",
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(10),
-                          )
-                      ),
+                      decoration: workoutFormDecoration.copyWith(hintText: 'Description'),
                     ),
 
                     //Score
@@ -151,14 +134,7 @@ class _EnterWodScreenState extends State<EnterWodScreen>{
                         _scoreController.text = value;
                       },
                       textInputAction: TextInputAction.next,
-                      decoration: InputDecoration(
-                          contentPadding: EdgeInsets.fromLTRB(20, 15, 20, 15),
-                          hintText: "Score",
-                          labelText: "Score",
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(10),
-                          )
-                      ),
+                      decoration: workoutFormDecoration.copyWith(hintText: 'Score'),
                     ),
 
                     //Buttons
@@ -169,9 +145,8 @@ class _EnterWodScreenState extends State<EnterWodScreen>{
                         Expanded(
                             child: MaterialButton(
                                 padding: const EdgeInsets.all(15),
-                                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10.0)),
                                 elevation: 5,
-                                color: Colors.blue.shade900,
+                                color: Theme.of(context).primaryColor,
                                 child:Text("Save",style: TextStyle(color: Colors.white)) ,
                                 onPressed:(){
                                   _save(id,_dateController.text,dropdownValue,_descriptionController.text,_scoreController.text);
@@ -182,10 +157,8 @@ class _EnterWodScreenState extends State<EnterWodScreen>{
                         Expanded(
                             child: MaterialButton(
                                 padding: EdgeInsets.all(15),
-                                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10.0)),
                                 elevation: 5,
-                                color: Colors.blue.shade900,
-                                //color: Colors.teal.shade900,
+                                color: Theme.of(context).primaryColor,
                                 child:const Text("Cancel",style: TextStyle(color: Colors.white),) ,
                                 onPressed:(){
                                   Navigator.pop(context);

@@ -1,0 +1,47 @@
+{
+  "project_info": {
+    "project_number": "27599034902",
+    "project_id": "wodaily-ed188",
+    "storage_bucket": "wodaily-ed188.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:27599034902:android:2316fa26fb43d928a3b337",
+        "android_client_info": {
+          "package_name": "com.example.wodaily"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "27599034902-agbgo47cluu7t9ogi9r08ug3trltefku.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.wodaily",
+            "certificate_hash": "84ef4dcc5fb55afd2031ba4e64721221337ec21c"
+          }
+        },
+        {
+          "client_id": "27599034902-t4jl44034rqisb094g8ca18jh742ccq3.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyC-bc2fuxoLQgg2csm01h6KBNVLXpGaeq0"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "27599034902-t4jl44034rqisb094g8ca18jh742ccq3.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

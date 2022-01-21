@@ -1,4 +1,5 @@
-import 'package:WODaily/model/wodclass.dart';
+import 'package:WODaily/model/workout.dart';
+import 'package:WODaily/shared/constants.dart';
 import 'package:WODaily/utils/db_helper_util.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -51,7 +52,7 @@ class _EditWodScreenState extends State<EditWodScreen> {
     return Scaffold(
         resizeToAvoidBottomInset: false,
         appBar: AppBar(
-          title: const Text('New Workout'),
+          title: const Text('Edit Workout'),
           backgroundColor: Colors.blue.shade900,
         ),
         body: Padding(
@@ -86,14 +87,7 @@ class _EditWodScreenState extends State<EditWodScreen> {
                           _dateController.text = value;
                         },
                         textInputAction: TextInputAction.next,
-                        decoration: InputDecoration(
-                            contentPadding: EdgeInsets.fromLTRB(10, 15, 20, 15),
-                            hintText: "Date",
-                            labelText: "Date",
-                            border: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(10),
-                            )
-                        ),
+                        decoration: workoutFormDecoration.copyWith(labelText: 'Date'),
                       ),
 
                       //Type
@@ -102,7 +96,7 @@ class _EditWodScreenState extends State<EditWodScreen> {
 
                         alignment: AlignmentDirectional.center,
                         value: _dropdownValue,
-                        items: ['Select One','AMRAP','EMOM','For time','For weight','Chipper','Ladder','Tabata'].map((String value) {
+                        items: wodTypes.map((String value) {
                           return DropdownMenuItem<String>(
                             value: value,
                             child: Text(value),
@@ -113,12 +107,7 @@ class _EditWodScreenState extends State<EditWodScreen> {
                             _dropdownValue = value;
                           });
                         },
-                        decoration: InputDecoration(
-                            contentPadding: const EdgeInsets.fromLTRB(10, 15, 20, 15),
-                            border: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(10),
-                            )
-                        ),
+                        decoration: workoutFormDecoration.copyWith(labelText: 'Type'),
                       ),
 
                       //Description
@@ -138,14 +127,7 @@ class _EditWodScreenState extends State<EditWodScreen> {
                           _descriptionController.text = value;
                         },
                         textInputAction: TextInputAction.newline,
-                        decoration: InputDecoration(
-                            contentPadding: EdgeInsets.fromLTRB(10, 15, 20, 15),
-                            hintText: "Description",
-                            labelText: "Description",
-                            border: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(10),
-                            )
-                        ),
+                        decoration: workoutFormDecoration.copyWith(hintText: 'Description'),
                       ),
 
                       //Score
@@ -163,14 +145,7 @@ class _EditWodScreenState extends State<EditWodScreen> {
                           _scoreController.text = value;
                         },
                         textInputAction: TextInputAction.next,
-                        decoration: InputDecoration(
-                            contentPadding: EdgeInsets.fromLTRB(20, 15, 20, 15),
-                            hintText: "Score",
-                            labelText: "Score",
-                            border: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(10),
-                            )
-                        ),
+                        decoration: workoutFormDecoration.copyWith(hintText: 'Score'),
                       ),
 
                       //Buttons
@@ -181,9 +156,8 @@ class _EditWodScreenState extends State<EditWodScreen> {
                           Expanded(
                               child: MaterialButton(
                                   padding: EdgeInsets.all(15),
-                                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10.0)),
                                   elevation: 5,
-                                  color: Colors.blue.shade900,
+                                  color: Theme.of(context).primaryColor,
                                   child:Text("Update",style: TextStyle(color: Colors.white)) ,
                                   onPressed:(){
                                     _update(index,workout);
@@ -195,10 +169,8 @@ class _EditWodScreenState extends State<EditWodScreen> {
                           Expanded(
                               child: MaterialButton(
                                   padding: EdgeInsets.all(15),
-                                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10.0)),
                                   elevation: 5,
-                                  color: Colors.blue.shade900,
-                                  //color: Colors.teal.shade900,
+                                  color: Theme.of(context).primaryColor,
                                   child:Text("Cancel",style: TextStyle(color: Colors.white),) ,
                                   onPressed:(){
                                     Navigator.pop(context);

@@ -3,7 +3,7 @@ import 'package:path_provider/path_provider.dart';
 import 'package:sqflite/sqflite.dart';
 import 'dart:async';
 import 'package:path/path.dart';
-import 'package:WODaily/model/wodclass.dart';
+import 'package:WODaily/model/workout.dart';
 
 
 class DatabaseHelper {
@@ -62,7 +62,7 @@ class DatabaseHelper {
   // TODO: add date to this call
   Future<List> getAllData() async {
     var dbClient = await db;
-    var result = await dbClient.rawQuery("SELECT * FROM $tableName ORDER BY $columnDate ASC");
+    var result = await dbClient.rawQuery("SELECT * FROM $tableName ORDER BY $columnDate DESC");
     return result.toList();
   }
 
@@ -70,7 +70,7 @@ class DatabaseHelper {
     var dbClient = await db;
     String monthStr = month.toString().padLeft(2,'0');
     String currYear = DateTime.now().year.toString();
-    var result = await dbClient.rawQuery("SELECT * FROM $tableName WHERE strftime('%m', $columnDate) = '$monthStr'");
+    var result = await dbClient.rawQuery("SELECT * FROM $tableName WHERE strftime('%m', $columnDate) = '$monthStr' ORDER BY $columnDate DESC");
     //var result = await dbClient.rawQuery("SELECT * FROM $tableName WHERE strftime('%m', $columnDate) = '$monthStr' AND strftime('%Y', $columnDate) = '$currYear'");
     return result.toList();
   }
