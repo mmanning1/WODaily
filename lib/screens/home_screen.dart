@@ -54,7 +54,6 @@ class _WodHomeState extends State<WodHome> {
               },
             )
           ],
-          backgroundColor: Colors.blue.shade900,
         ),
         body: Center(
           child: Column(
@@ -97,23 +96,19 @@ class _WodHomeState extends State<WodHome> {
                       shrinkWrap: true,
                       itemBuilder: (BuildContext context,int index){
                         return Card(
-                          color:Colors.blue.shade900,
                           elevation: 5,
                           margin: EdgeInsets.all(3),
                           shape:const OutlineInputBorder(
-                              borderRadius: BorderRadius.only(topLeft:Radius.circular(10.0),
-                                  topRight: Radius.circular(10.0),
-                                  bottomLeft: Radius.circular(10)
-                              )
+                              borderRadius: BorderRadius.all(Radius.circular(8))
                           ),
                           child: ListTile(
                             // Might not need the year here if we are showing monthly
                               title: Text(DateFormat('MM/dd/yy').format(DateTime.parse(_wodList[index].date)),
-                                style:  const TextStyle(color: Colors.white,fontSize: 20.0),),
+                                style:  const TextStyle(fontSize: 20.0),),
                               subtitle: Text(_wodList[index].type + ': ' + _wodList[index].description,
-                                style:  const TextStyle(color: Colors.white,fontSize: 10.0),),
+                                style:  const TextStyle(fontSize: 10.0),),
                               trailing: Text(_wodList[index].score,
-                                  style:  const TextStyle(color: Colors.white)),
+                                  style:  const TextStyle()),
                               onTap: () async {
                                 final Wod editedWod = await Navigator.push(context,MaterialPageRoute(
                                     builder: (context) => EditWodScreen(workout: _wodList[index], index: index)
@@ -152,7 +147,6 @@ class _WodHomeState extends State<WodHome> {
           ),
         ),
         floatingActionButton: FloatingActionButton(
-            backgroundColor: Colors.blue.shade600,
             child: const Icon(Icons.add),
             tooltip: "Add",
             elevation: 10,

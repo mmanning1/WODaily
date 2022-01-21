@@ -4,7 +4,7 @@ import 'package:WODaily/services/auth.dart';
 import 'package:WODaily/shared/constants.dart';
 import 'package:WODaily/shared/loading.dart';
 import 'package:flutter/material.dart';
-import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:flutter_signin_button/flutter_signin_button.dart';
 
 class SignIn extends StatefulWidget {
   @override
@@ -90,7 +90,6 @@ class _SignInState extends State<SignIn> {
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   Text("Dont have an account? "),
-
                   TextButton(
                     child: Text("Sign up"),
                     onPressed: () async {
@@ -101,14 +100,29 @@ class _SignInState extends State<SignIn> {
                   )
                 ],
               ),
-              const SizedBox(height: 30,),
-              ElevatedButton.icon(
-                  style: ElevatedButton.styleFrom(
-                      primary: Colors.white54,
-                      onPrimary: Colors.black,
-                      minimumSize: Size(double.infinity, 50)
-                  ),
-                  icon: FaIcon(FontAwesomeIcons.google,color: Colors.redAccent,),
+              SizedBox(height: 10.0),
+              Row(
+                  children: <Widget>[
+                    Expanded(
+                        child: Divider(
+                          thickness: 1,
+                          endIndent: 10,
+                        )
+                    ),
+                    Text('OR'),
+                    Expanded(
+                        child: Divider(
+                          indent: 10,
+                          thickness: 1,
+                        )
+                    ),
+                  ]
+              ),
+              SizedBox(height: 10.0),
+              SignInButton(
+                  Buttons.GoogleDark,
+                  text: "   Sign in with Google",
+
                   onPressed: () async {
                     setState(() => _loading = true);
                     dynamic result = await _auth.signInGoogle();
@@ -118,9 +132,7 @@ class _SignInState extends State<SignIn> {
                         _loading = false;
                       });
                     }
-                  },
-                  label: Text("Sign in with Google")
-              ),
+                  }),
               Text(
                 error,
                 style: TextStyle(color: Colors.red, fontSize: 14.0),

@@ -2,6 +2,7 @@ import 'package:WODaily/model/user.dart';
 import 'package:WODaily/screens/authenticate/sign_in.dart';
 import 'package:WODaily/screens/wrapper.dart';
 import 'package:WODaily/services/auth.dart';
+import 'package:WODaily/shared/constants.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
@@ -29,6 +30,7 @@ class MyApp extends StatelessWidget {
       child: MaterialApp(
         title: 'WODaily',
         debugShowCheckedModeBanner: false,
+        theme: mainThemeData,
         home: Wrapper(),
       ),
     );
