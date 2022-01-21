@@ -43,3 +43,5 @@ ThemeData mainThemeData = ThemeData(
         backgroundColor: Colors.blue.shade900
     )
 );
+
+const List<String> wodTypes = ['Select One','AMRAP','EMOM','Reps','For time','For weight','Chipper','Ladder','Tabata'];

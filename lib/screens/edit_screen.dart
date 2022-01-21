@@ -96,7 +96,7 @@ class _EditWodScreenState extends State<EditWodScreen> {
 
                         alignment: AlignmentDirectional.center,
                         value: _dropdownValue,
-                        items: ['Select One','AMRAP','EMOM','For time','For weight','Chipper','Ladder','Tabata'].map((String value) {
+                        items: wodTypes.map((String value) {
                           return DropdownMenuItem<String>(
                             value: value,
                             child: Text(value),

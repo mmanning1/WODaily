@@ -85,7 +85,7 @@ class _EnterWodScreenState extends State<EnterWodScreen>{
                     DropdownButtonFormField(
                       alignment: AlignmentDirectional.center,
                       value: dropdownValue,
-                      items: ['Select One','AMRAP','EMOM','For time','For weight','Chipper','Ladder','Tabata'].map((String value) {
+                      items: wodTypes.map((String value) {
                         return DropdownMenuItem<String>(
                           value: value,
                           child: Text(value),

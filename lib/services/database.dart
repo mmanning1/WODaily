@@ -1,4 +1,3 @@
-import 'package:WODaily/model/workout.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 class DatabaseService {

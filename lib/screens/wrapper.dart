@@ -1,4 +1,3 @@
-import 'package:WODaily/main.dart';
 import 'package:WODaily/model/user.dart';
 import 'package:WODaily/screens/authenticate/authenticate.dart';
 import 'package:flutter/cupertino.dart';
@@ -16,7 +15,6 @@ class Wrapper extends StatelessWidget{
     } else {
       return WodHome();
     }
-    return Authenticate();
   }
 
 }
