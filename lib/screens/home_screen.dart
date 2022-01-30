@@ -1,6 +1,4 @@
 
-import 'dart:developer';
-
 import 'package:WODaily/model/workout.dart';
 import 'package:WODaily/screens/timer_screen.dart';
 import 'package:WODaily/services/auth.dart';

@@ -74,7 +74,9 @@ class _EditWodScreenState extends State<EditWodScreen> {
                           // Show Date Picker Here
                           await _selectDate(context);
                           // Needs to be 2012-02-27
-                          _dateController.text = DateFormat('yyyy-MM-dd').format(date);
+                          if (date != null) {
+                            _dateController.text = DateFormat('yyyy-MM-dd').format(date);
+                          }
                           //setState(() {});
                         },
                         validator: (value) {
@@ -191,7 +193,7 @@ class _EditWodScreenState extends State<EditWodScreen> {
     final DateTime picked = await showDatePicker(
         context: context,
         initialDate: date ?? now,
-        firstDate: now,
+        firstDate: DateTime(2000),
         lastDate: DateTime(2101));
     if (picked != null && picked != date) {
       print('hello $picked');
