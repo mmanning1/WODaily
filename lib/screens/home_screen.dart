@@ -88,7 +88,6 @@ class _WodHomeState extends State<WodHome> {
                       isSelected: _isSelected,
                       onPressed: (int index) {
                         setState(() {
-                          print('Button selected: ' + index.toString());
                           for (int i = 0; i < _isSelected.length; i++) {
                             _isSelected[i] = i == index;
                             if (index == 1) {
@@ -131,6 +130,7 @@ class _WodHomeState extends State<WodHome> {
   }
 
   Widget getCalenderView(){
+    updateCalendar();
     return Column(
       children: [
           TableCalendar(
@@ -322,13 +322,19 @@ class _WodHomeState extends State<WodHome> {
     for (var wod in wods) {
       setState(() {
         _wodList.add(Wod.fromMap(wod));
+      });
+    }
+  }
 
-        DateTime date = DateTime.parse(Wod.fromMap(wod).date);
-        print("Date from wods: " + date.toLocal().toString());
+  void updateCalendar() {
+    _calendarWods.clear();
+    for(var wod in _wodList){
+      setState(() {
+        DateTime date = DateTime.parse(wod.date);
         if (_calendarWods[date]!=null) {
-          _calendarWods[date].add(Wod.fromMap(wod));
+          _calendarWods[date].add(wod);
         } else {
-          _calendarWods[date] = [Wod.fromMap(wod)];
+          _calendarWods[date] = [wod];
         }
       });
     }
