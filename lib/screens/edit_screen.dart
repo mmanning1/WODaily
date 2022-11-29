@@ -1,40 +1,38 @@
 import 'package:WODaily/model/workout.dart';
+import 'package:WODaily/services/database.dart';
 import 'package:WODaily/shared/constants.dart';
 import 'package:WODaily/utils/db_helper_util.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
 class EditWodScreen extends StatefulWidget {
-  final Wod workout;
-  final int index;
+  final QueryDocumentSnapshot<Object> workout;
 
-  EditWodScreen({this.workout, this.index});
+  EditWodScreen({this.workout});
 
   @override
-  _EditWodScreenState createState() => _EditWodScreenState(workout,index);
+  _EditWodScreenState createState() => _EditWodScreenState(workout);
 }
 
 class _EditWodScreenState extends State<EditWodScreen> {
-  Wod workout;
-  int index;
-  int id;
+  QueryDocumentSnapshot<Object> workout;
   String type;
   String desc;
   String score;
   DateTime date;
   String _dropdownValue = 'Select One';
 
-  _EditWodScreenState(this.workout,this.index);
+  _EditWodScreenState(this.workout);
 
   @override
   void initState() {
     super.initState();
-    id=workout.id;
-    _dateController.text=workout.date;
-    _dropdownValue = workout.type;
-    _descriptionController.text=workout.description;
-    _scoreController.text=workout.score;
+    _dateController.text=DateFormat('MM/dd/yy').format(workout['date'].toDate());
+    _dropdownValue = workout['type'];
+    _descriptionController.text=workout['description'];
+    _scoreController.text=workout['score'];
   }
 
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
@@ -75,7 +73,7 @@ class _EditWodScreenState extends State<EditWodScreen> {
                           await _selectDate(context);
                           // Needs to be 2012-02-27
                           if (date != null) {
-                            _dateController.text = DateFormat('yyyy-MM-dd').format(date);
+                            _dateController.text = DateFormat('MM/dd/yy').format(date);
                           }
                           //setState(() {});
                         },
@@ -162,8 +160,13 @@ class _EditWodScreenState extends State<EditWodScreen> {
                                   color: Theme.of(context).primaryColor,
                                   child:Text("Update",style: TextStyle(color: Colors.white)) ,
                                   onPressed:(){
-                                    _update(index,workout);
-
+                                    DatabaseService().updateWodData(workout.id,
+                                        _dateController.text,
+                                        _descriptionController.text,
+                                        _scoreController.text,
+                                        _dropdownValue.toString());
+                                    //_update(index,workout);
+                                    Navigator.pop(context);
                                   }
                               )
                           ),
@@ -203,8 +206,11 @@ class _EditWodScreenState extends State<EditWodScreen> {
     }
   }
 
+  /*
+    Use this method for saving workouts locally
+    Otherwise use DatabaseService for cloud functions
+   */
   _update(int index,Wod wod) async {
-
     Wod updated = Wod.fromMap({
       "date":_dateController.text,
       "type":_dropdownValue,

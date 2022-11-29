@@ -41,15 +41,14 @@ class _WodHomeState extends State<WodHome> {
   void initState(){
     _calendarWods = {};
     super.initState();
-    getData();
+    //getData();
   }
 
   final AuthService _auth = AuthService();
 
   @override
   Widget build(BuildContext context) {
-    return StreamProvider<QuerySnapshot>.value(
-      value: DatabaseService().dbusers, //this part needs to be the wods
+    return StreamProvider<QuerySnapshot>(
       child: Scaffold(
         appBar: AppBar(
           title: const Text("WODaily"),
@@ -118,7 +117,7 @@ class _WodHomeState extends State<WodHome> {
                 // In case they pressed cancel
                 if (newWod != null) {
                   //In case they entered a workout for a different month
-                  if (DateFormat('yyyy-MM-dd').parse(newWod.date).month == _month) {
+                  if (DateFormat('MM/dd/yy').parse(newWod.date).month == _month) {
                     _wodList.insert(0, newWod);
                   }
                 }
@@ -230,7 +229,7 @@ class _WodHomeState extends State<WodHome> {
                 onPressed: () {
                   setState(() {
                     _month = (_month == 1) ? 12 : _month-1;
-                    getData();
+                    //getData();
                   });
                 },
                 icon: const Icon(FontAwesomeIcons.angleDoubleLeft),
@@ -244,7 +243,7 @@ class _WodHomeState extends State<WodHome> {
                 onPressed: () {
                   setState(() {
                     _month = (_month == 12) ? 1 : _month+1;
-                    getData();
+                    //getData();
                   });
                 },
                 icon: const Icon(FontAwesomeIcons.angleDoubleRight),
@@ -253,56 +252,64 @@ class _WodHomeState extends State<WodHome> {
 
           ),
           Expanded(
-            // final wods = Provider.of<QuerySnapshot>(context);
-            // put in wod model and for loop
-              child: ListView.builder(
-                  itemCount: _wodList.length,
-                  scrollDirection: Axis.vertical,
-                  shrinkWrap: true,
-                  itemBuilder: (BuildContext context,int index){
-                    return Card(
-                      elevation: 5,
-                      margin: EdgeInsets.all(3),
-                      shape:const OutlineInputBorder(
-                          borderRadius: BorderRadius.all(Radius.circular(8))
-                      ),
-                      child: ListTile(
-                        // Might not need the year here if we are showing monthly
-                          title: Text(DateFormat('MM/dd/yy').format(DateTime.parse(_wodList[index].date)),
-                            style:  const TextStyle(fontSize: 20.0),),
-                          subtitle: Text(_wodList[index].type + ': ' + _wodList[index].description,
-                            style:  const TextStyle(fontSize: 10.0),),
-                          trailing: Text(_wodList[index].score,
-                              style:  const TextStyle()),
-                          onTap: () async {
-                            final Wod editedWod = await Navigator.push(context,MaterialPageRoute(
-                                builder: (context) => EditWodScreen(workout: _wodList[index], index: index)
-                            ));
-                            setState(() {
-                              if (editedWod != null) {
-                                _wodList[index] = editedWod;
-                              }
-                            });
-                          },
-                          onLongPress: () => showDialog<String>(
-                              context: context,
-                              builder: (BuildContext) => AlertDialog(
-                                title: const Text("Delete Workout?"),
-                                actions: <Widget>[
-                                  TextButton(
-                                    onPressed: () {
-                                      Navigator.pop(context, 'Delete');
-                                      _delete(_wodList[index].id,index);
-                                    },
-                                    child: const Text('Delete'),
-                                  ),
-                                  TextButton(
-                                    onPressed: () => Navigator.pop(context, 'Cancel'),
-                                    child: const Text('Cancel'),
-                                  ),
-                                ],
-                              )
-                          )
+              child: StreamBuilder(
+                  stream: DatabaseService().dbwodsByMonth(_month),
+                  builder: (BuildContext context,AsyncSnapshot<QuerySnapshot> snapshot){
+                    if (!snapshot.hasData){
+                      return Center(
+                        child: CircularProgressIndicator()
+                      );
+                    }
+                    return Container(
+                      child: ListView(
+                        children: snapshot.data.docs.map((wodSnapshot) {
+                          return Card(
+                            elevation: 5,
+                            margin: EdgeInsets.all(3),
+                            shape:const OutlineInputBorder(
+                                borderRadius: BorderRadius.all(Radius.circular(8))
+                            ),
+                            child: ListTile(
+                              // Might not need the year here if we are showing monthly
+                                title: Text(DateFormat('MM/dd/yy').format(wodSnapshot['date'].toDate()),
+                                          style:  const TextStyle(fontSize: 20.0),),
+                                subtitle: Text(wodSnapshot['description'],
+                                            style:  const TextStyle(fontSize: 20.0),),
+                                trailing: Text(wodSnapshot['score'],
+                                            style:  const TextStyle(fontSize: 20.0),),
+                                onTap: () async {
+                                  final Wod editedWod = await Navigator.push(context,MaterialPageRoute(
+                                      builder: (context) => EditWodScreen(workout: wodSnapshot)
+                                  ));
+                                  /*setState(() {
+                                    if (editedWod != null) {
+                                    }
+                                  });*/
+                                },
+
+                                onLongPress: () => showDialog<String>(
+                                    context: context,
+                                    builder: (BuildContext) => AlertDialog(
+                                      title: const Text("Delete Workout?"),
+                                      actions: <Widget>[
+                                        TextButton(
+                                          onPressed: () {
+                                            Navigator.pop(context, 'Delete');
+                                            print(wodSnapshot.id);
+                                            DatabaseService().deleteWod(wodSnapshot.id);
+                                          },
+                                          child: const Text('Delete'),
+                                        ),
+                                        TextButton(
+                                          onPressed: () => Navigator.pop(context, 'Cancel'),
+                                          child: const Text('Cancel'),
+                                        ),
+                                      ],
+                                    )
+                                )
+                            ),
+                          );
+                        }).toList(),
                       ),
                     );
                   }
@@ -313,6 +320,9 @@ class _WodHomeState extends State<WodHome> {
     );
   }
 
+  /*
+  Deprecated now that we are using a stream for the firestore database
+   */
   getData() async {
     // Will have to incorporate year here eventually to
     // prevent past years data from populating into current year

@@ -1,25 +1,40 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:intl/intl.dart';
+
 /// See https://docs.flutter.dev/cookbook/persistence/sqlite for doc
 
 class Wod {
   //String _title;
-  int _id;
-  String _date;
-  String _type;
-  String _description;
-  String _score;
+  int id;
+  String date;
+  String type;
+  String description;
+  String score;
 
 
-  Wod(this._date, this._type, this._description, this._score);
+  Wod({this.date, this.type, this.description, this.score});
 
   //String get title => _title;
-  int get id=>_id;
-  String get date => _date;
-  String get type => _type;
-  String get description => _description;
-  String get score => _score;
+  int get _id=>id;
+  String get _date => date;
+  String get _type => type;
+  String get _description => description;
+  String get _score => score;
 
 
-  Map<String, dynamic>toMap(){
+  Map<String, dynamic>toFirestoreMap(){
+    DateTime dttm = DateFormat('MM/dd/yy').parse(date);
+    String month = DateFormat('MMMM').format(DateTime(0, dttm.month));
+    return {
+      'date' : dttm,
+      'month' : month,
+      'type' : type,
+      'description' : description,
+      'score' : score
+    };
+  }
+
+  Map<String, dynamic>toSQliteMap(){
     return {
       'id' : id,
       'date' : date,
@@ -36,10 +51,10 @@ class Wod {
 
   Wod.fromMap(Map<String,dynamic>map){
     //this._title=map["title"];
-    this._date=map["date"];
-    this._type=map["type"];
-    this._description=map["description"];
-    this._score=map["score"];
-    this._id=map["id"];
+    this.date=map["date"];
+    this.type=map["type"];
+    this.description=map["description"];
+    this.score=map["score"];
+    this.id=map["id"];
   }
 }

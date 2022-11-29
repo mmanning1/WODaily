@@ -38,7 +38,7 @@ class DatabaseHelper {
 
   insertData(Wod noDoItem) async {
     var dbClient = await db;
-    int result = await dbClient.insert("$tableName", noDoItem.toMap(), conflictAlgorithm: ConflictAlgorithm.replace,);
+    int result = await dbClient.insert("$tableName", noDoItem.toSQliteMap(), conflictAlgorithm: ConflictAlgorithm.replace,);
     return result;
   }
 
@@ -54,7 +54,7 @@ class DatabaseHelper {
   Future<int> updateItem(Wod updatedWod) async {
     var dbClient = await db;
     print("Updating wod with id: " + updatedWod.id.toString());
-    return await dbClient.update(tableName, updatedWod.toMap(),
+    return await dbClient.update(tableName, updatedWod.toFirestoreMap(),
         where: "$columnId =?", whereArgs: [updatedWod.id]);
   }
 

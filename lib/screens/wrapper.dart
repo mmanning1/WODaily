@@ -1,5 +1,9 @@
 import 'package:WODaily/model/user.dart';
+import 'package:WODaily/model/workout.dart';
 import 'package:WODaily/screens/authenticate/authenticate.dart';
+import 'package:WODaily/services/auth.dart';
+import 'package:WODaily/services/database.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:provider/provider.dart';
 

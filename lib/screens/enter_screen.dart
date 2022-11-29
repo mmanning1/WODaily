@@ -1,3 +1,5 @@
+import 'package:WODaily/services/auth.dart';
+import 'package:WODaily/services/database.dart';
 import 'package:WODaily/shared/constants.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
@@ -31,7 +33,7 @@ class _EnterWodScreenState extends State<EnterWodScreen>{
   final TextEditingController _scoreController = TextEditingController();
   final TextEditingController _dateController = TextEditingController();
 
-  // Need to create database helper
+  // Need to create database helper - might not need this after fiebase
   var db = DatabaseHelper();
 
   @override
@@ -63,7 +65,7 @@ class _EnterWodScreenState extends State<EnterWodScreen>{
                         await _selectDate(context);
                         // Needs to be 2012-02-27
                         if (date != null) {
-                          _dateController.text = DateFormat('yyyy-MM-dd').format(date);
+                          _dateController.text = DateFormat('MM/dd/yy').format(date);
                         }
                         //setState(() {});
                       },
@@ -179,12 +181,17 @@ class _EnterWodScreenState extends State<EnterWodScreen>{
   void initState() {
     super.initState();
     print('Creating new WOD');
-    _dateController.text = DateFormat('yyyy-MM-dd').format(DateTime.now());
+    _dateController.text = DateFormat('MM/dd/yy').format(DateTime.now());
 
   }
 
   void _save(int wodId,String date, String type, String desc, String score) async {
-    Wod newWod = Wod(date, type, desc, score);
+    Wod newWod = Wod(date: date, type: type, description: desc, score: score);
+
+    //firebase
+    await DatabaseService().createWodData(newWod);
+
+    //internal db
     int savedItemId = await db.insertData(newWod);
     // Don't need this now, might implement later
     //Wod addedItem = await db.getSingleData(savedItemId);
