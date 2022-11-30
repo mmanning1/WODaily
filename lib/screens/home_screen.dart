@@ -22,7 +22,7 @@ class WodHome extends StatefulWidget {
 }
 
 class _WodHomeState extends State<WodHome> {
-  final List<Wod> _wodList = <Wod>[];
+  final List<Wod> _wodList = <Wod>[]; // Deprecated
   int _month = DateTime.now().month;
   var db=DatabaseHelper();
   List<bool> _isSelected = [true, false];
@@ -42,7 +42,6 @@ class _WodHomeState extends State<WodHome> {
   void initState(){
     _calendarWods = {};
     super.initState();
-    //getData();
   }
 
   final AuthService _auth = AuthService();
@@ -230,6 +229,33 @@ class _WodHomeState extends State<WodHome> {
               title: Text(DateFormat('MM/dd/yy').format(wodSnapshot['date'].toDate())),
               subtitle: Text(wodSnapshot['type'] + ":" + wodSnapshot['description'], style: const TextStyle(fontSize: 16.0),),
               trailing: Text(wodSnapshot['score']),
+
+              onTap: () async {
+                await Navigator.push(this.context,MaterialPageRoute(
+                    builder: (context) => EditWodScreen(workout: wodSnapshot)
+                ));
+              },
+
+              onLongPress: () => showDialog<String>(
+                  context: this.context,
+                  builder: (BuildContext) => AlertDialog(
+                    title: const Text("Delete Workout?"),
+                    actions: <Widget>[
+                      TextButton(
+                        onPressed: () {
+                          Navigator.pop(this.context, 'Delete');
+                          print(wodSnapshot.id);
+                          DatabaseService().deleteWod(wodSnapshot.id);
+                        },
+                        child: const Text('Delete'),
+                      ),
+                      TextButton(
+                        onPressed: () => Navigator.pop(this.context, 'Cancel'),
+                        child: const Text('Cancel'),
+                      ),
+                    ],
+                  )
+              )
             ),
         ),
         )
