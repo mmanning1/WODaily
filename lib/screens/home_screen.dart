@@ -267,21 +267,27 @@ class _WodHomeState extends State<WodHome> {
     return Expanded(
       child: Column(
         children: [
+          SizedBox(
+            // Just so that the headers look the same
+            // Maybe copy the table_calender's header style?
+            width: double.infinity,
+            height: 8,
+          ),
           Row(
             children: <Widget>[
               IconButton(
                 onPressed: () {
                   setState(() {
                     _month = (_month == 1) ? 12 : _month-1;
-                    //getData();
                   });
                 },
-                icon: const Icon(FontAwesomeIcons.angleDoubleLeft),
+                padding: const EdgeInsets.only(left: 16.0),
+                icon: const Icon(Icons.chevron_left),
               ),
               Expanded(
                 child: Text(DateFormat('MMMM').format(DateTime(0,_month)),
-                    textAlign: TextAlign.center,
-                    textScaleFactor: 2),
+                    style: const TextStyle(fontSize: 17.0),
+                    textAlign: TextAlign.center),
               ),
               IconButton(
                 onPressed: () {
@@ -290,7 +296,8 @@ class _WodHomeState extends State<WodHome> {
                     //getData();
                   });
                 },
-                icon: const Icon(FontAwesomeIcons.angleDoubleRight),
+                padding: const EdgeInsets.only(right: 16.0),
+                icon: const Icon(Icons.chevron_right),
               ),
             ],
           ),
