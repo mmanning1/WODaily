@@ -118,23 +118,14 @@ class _WodHomeState extends State<WodHome> {
             );
           },
       ),
-      floatingActionButton: _calendarMode ? null : FloatingActionButton(
+      floatingActionButton: FloatingActionButton(
           child: const Icon(Icons.add),
           tooltip: "Add",
           elevation: 10,
           onPressed:() async {
-            final Wod newWod = await Navigator.push(context, MaterialPageRoute(
+            await Navigator.push(context, MaterialPageRoute(
                 builder: (context) => EnterWodScreen()
             ));
-            setState(() {
-              // In case they pressed cancel
-              if (newWod != null) {
-                //In case they entered a workout for a different month
-                if (DateFormat('MM/dd/yy').parse(newWod.date).month == _month) {
-                  _wodList.insert(0, newWod);
-                }
-              }
-            });
           }
       ),
     );
@@ -296,13 +287,9 @@ class _WodHomeState extends State<WodHome> {
                         trailing: Text(wodSnapshot['score'],
                                     style:  const TextStyle(fontSize: 20.0),),
                         onTap: () async {
-                          final Wod editedWod = await Navigator.push(this.context,MaterialPageRoute(
+                          await Navigator.push(this.context,MaterialPageRoute(
                               builder: (context) => EditWodScreen(workout: wodSnapshot)
                           ));
-                          /*setState(() {
-                            if (editedWod != null) {
-                            }
-                          });*/
                         },
 
                         onLongPress: () => showDialog<String>(
