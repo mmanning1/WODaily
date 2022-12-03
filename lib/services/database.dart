@@ -19,17 +19,6 @@ class DatabaseService {
     });
   }
 
-  // Not using this anywhere
-  Stream<QuerySnapshot> get dbusers {
-    return users.snapshots();
-  }
-
-  // Not using this anywhere
-  Stream<QuerySnapshot> get dbwods {
-    // Only get from this month
-    return wods.where('month',isEqualTo: DateFormat('MMMM').format(DateTime(0, DateTime.now().month))).snapshots();
-  }
-
   Stream<QuerySnapshot> dbwodsByMonth(int month, String id) {
     // Only get from this month
     int year = DateTime.now().year;
