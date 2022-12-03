@@ -1,4 +1,5 @@
 
+import 'package:WODaily/model/user.dart';
 import 'package:WODaily/model/workout.dart';
 import 'package:WODaily/screens/timer_screen.dart';
 import 'package:WODaily/services/auth.dart';
@@ -23,6 +24,7 @@ class WodHome extends StatefulWidget {
 
 class _WodHomeState extends State<WodHome> {
   final List<Wod> _wodList = <Wod>[]; // Deprecated
+  var user = new WodUser();
   int _month = DateTime.now().month;
   var db=DatabaseHelper();
   List<bool> _isSelected = [true, false];
@@ -48,6 +50,7 @@ class _WodHomeState extends State<WodHome> {
 
   @override
   Widget build(BuildContext context) {
+    user = Provider.of<WodUser>(context);
     return Scaffold(
         appBar: AppBar(
           title: const Text("WODaily"),
@@ -68,7 +71,7 @@ class _WodHomeState extends State<WodHome> {
           ],
         ),
         body: StreamBuilder(
-          stream: DatabaseService().dbwodsByMonth(_month),
+          stream: DatabaseService().dbwodsByMonth(_month, user.uid),
           builder: (BuildContext context,AsyncSnapshot<QuerySnapshot> snapshot) {
             if (!snapshot.hasData) {
               return Center(
@@ -245,7 +248,7 @@ class _WodHomeState extends State<WodHome> {
                         onPressed: () {
                           Navigator.pop(this.context, 'Delete');
                           print(wodSnapshot.id);
-                          DatabaseService().deleteWod(wodSnapshot.id);
+                          DatabaseService().deleteWod(wodSnapshot.id, user.uid);
                         },
                         child: const Text('Delete'),
                       ),
@@ -334,7 +337,7 @@ class _WodHomeState extends State<WodHome> {
                                   onPressed: () {
                                     Navigator.pop(this.context, 'Delete');
                                     print(wodSnapshot.id);
-                                    DatabaseService().deleteWod(wodSnapshot.id);
+                                    DatabaseService().deleteWod(wodSnapshot.id, user.uid);
                                   },
                                   child: const Text('Delete'),
                                 ),

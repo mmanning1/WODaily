@@ -1,3 +1,4 @@
+import 'package:WODaily/model/user.dart';
 import 'package:WODaily/model/workout.dart';
 import 'package:WODaily/services/database.dart';
 import 'package:WODaily/shared/constants.dart';
@@ -6,6 +7,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:provider/provider.dart';
 
 class EditWodScreen extends StatefulWidget {
   final QueryDocumentSnapshot<Object> workout;
@@ -46,6 +48,7 @@ class _EditWodScreenState extends State<EditWodScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final user = Provider.of<WodUser>(context);
     // TODO: implement build
     return Scaffold(
         resizeToAvoidBottomInset: false,
@@ -164,7 +167,8 @@ class _EditWodScreenState extends State<EditWodScreen> {
                                         _dateController.text,
                                         _descriptionController.text,
                                         _scoreController.text,
-                                        _dropdownValue.toString());
+                                        _dropdownValue.toString(),
+                                        user.uid);
                                     //_update(index,workout);
                                     Navigator.pop(context);
                                   }

@@ -1,3 +1,4 @@
+import 'package:WODaily/model/user.dart';
 import 'package:WODaily/services/auth.dart';
 import 'package:WODaily/services/database.dart';
 import 'package:WODaily/shared/constants.dart';
@@ -5,6 +6,8 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:WODaily/model/workout.dart';
 import 'package:WODaily/utils/db_helper_util.dart';
+import 'package:provider/provider.dart';
+
 
 class EnterWodScreen extends StatefulWidget {
   int id;
@@ -186,10 +189,11 @@ class _EnterWodScreenState extends State<EnterWodScreen>{
   }
 
   void _save(int wodId,String date, String type, String desc, String score) async {
+    final user = Provider.of<WodUser>(context, listen: false);
     Wod newWod = Wod(date: date, type: type, description: desc, score: score);
 
     //firebase
-    await DatabaseService().createWodData(newWod);
+    await DatabaseService().createWodData(newWod, user.uid);
 
     //internal db
     int savedItemId = await db.insertData(newWod);

@@ -19,41 +19,43 @@ class DatabaseService {
     });
   }
 
-  //get users stream
+  // Not using this anywhere
   Stream<QuerySnapshot> get dbusers {
     return users.snapshots();
   }
 
+  // Not using this anywhere
   Stream<QuerySnapshot> get dbwods {
     // Only get from this month
     return wods.where('month',isEqualTo: DateFormat('MMMM').format(DateTime(0, DateTime.now().month))).snapshots();
   }
 
-  Stream<QuerySnapshot> dbwodsByMonth(int month) {
+  Stream<QuerySnapshot> dbwodsByMonth(int month, String id) {
     // Only get from this month
     int year = DateTime.now().year;
     print('Getting wods by month: ' + DateFormat('MMMM').format(DateTime(0, month)));
-    Stream<QuerySnapshot> stream = wods.where('month',isEqualTo: DateFormat('MMMM').format(DateTime(0, month))).snapshots();
-
+    //Stream<QuerySnapshot> stream = wods.where('month',isEqualTo: DateFormat('MMMM').format(DateTime(0, month))).snapshots();
+  Stream<QuerySnapshot> stream = users.doc(id).collection('workouts').where('month',isEqualTo: DateFormat('MMMM').format(DateTime(0, month))).snapshots();
     return stream;
   }
 
   //need to create or update wods from here
-  Future createWodData(Wod wod) async {
+  Future createWodData(Wod wod, String id) async {
     print("New wod: " + wod.toString());
-    final DocumentReference dr = await wods.add(wod.toFirestoreMap());
+    //final DocumentReference dr = await wods.add(wod.toFirestoreMap());
+    final DocumentReference dr = await users.doc(id).collection("workouts").add(wod.toFirestoreMap());
     return dr.id;
   }
 
-  void deleteWod(String id) {
-    wods.doc(id).delete()
+  void deleteWod(String wid, String uid) {
+    users.doc(uid).collection('workouts').doc(wid).delete()
         .then((value) => print("Delete successul!"));
   }
 
-  Future updateWodData(String uid, String date, String desc, String score, String type) async {
+  Future updateWodData(String wid, String date, String desc, String score, String type, String uid) async {
     DateTime dttm = DateFormat('MM/dd/yy').parse(date);
     String month = DateFormat('MMMM').format(DateTime(0, dttm.month));
-    return await wods.doc(uid).set({
+    return await users.doc(uid).collection('workouts').doc(wid).set({
       'date': dttm,
       'month':month,
       'description': desc,
