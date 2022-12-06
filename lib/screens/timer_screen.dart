@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
+import 'package:stop_watch_timer/stop_watch_timer.dart';
 
 class TimerScreen extends StatefulWidget {
 
@@ -9,10 +10,9 @@ class TimerScreen extends StatefulWidget {
 }
 
 class _TimerScreenState extends State<TimerScreen>{
-  static const countdownDuration = Duration(minutes:10 );
-  Duration duration = Duration();
-  Timer timer;
-
+  final StopWatchTimer _stopWatchTimer = StopWatchTimer();
+  final _isHours = true;
+  final _scrollController = ScrollController();
   bool isCountdown = false;
 
   @override
@@ -21,51 +21,26 @@ class _TimerScreenState extends State<TimerScreen>{
     //startTimer();
   }
 
-  void reset(){
-    if (isCountdown) {
-      setState(() => duration = countdownDuration);
-    } else {
-      setState(() => duration = Duration());
-    }
+  void resetTimer(){
+    _stopWatchTimer.onResetTimer();
   }
 
-  void startTimer ({bool resets = true}) {
-    if (resets) {
-      reset();
-    }
-    timer = Timer.periodic(Duration(seconds: 1), (_) => addTime());
+  void startTimer () {
+    _stopWatchTimer.onStartTimer();
   }
 
-  void stopTimer({bool resets = true}) {
-    if (resets) {
-      reset();
-    }
-
-    setState(() => timer.cancel());
+  void stopTimer() {
+    _stopWatchTimer.onStopTimer();
   }
 
-  void addTime () {
-    final addSeconds = isCountdown ? -1 : 1;
-
-    if (mounted) {
-      setState(() {
-        final seconds = duration.inSeconds + addSeconds;
-
-        if(seconds < 0) {
-          timer.cancel();
-          //todo maybe beep here?
-        } else {
-          duration = Duration(seconds: seconds);
-        }
-      });
-    }
+  void lapTime() {
+    _stopWatchTimer.onAddLap();
   }
 
   @override
   void dispose() {
-    if (timer!=null) {
-      timer.cancel();
-    }
+    _stopWatchTimer.dispose();
+    _scrollController.dispose();
     super.dispose();
   }
 
@@ -81,7 +56,52 @@ class _TimerScreenState extends State<TimerScreen>{
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            buildTime(),
+            Container(
+              height: 120,
+              margin: const EdgeInsets.all(8),
+              child: StreamBuilder<List<StopWatchRecord>>(
+                stream: _stopWatchTimer.records,
+                initialData: _stopWatchTimer.records.value,
+                builder: (context, snapshot) {
+                  final value = snapshot.data;
+                  if(value.isEmpty){
+                    return Container();
+                  }
+                  Future.delayed(const Duration(milliseconds: 100), () {
+                    _scrollController.animateTo(
+                        _scrollController.position.maxScrollExtent,
+                        duration: const Duration(milliseconds: 200),
+                        curve: Curves.easeOut);
+                  });
+                  return ListView.builder(
+                    itemCount: value.length,
+                    controller: _scrollController,
+                    itemBuilder: (context, index) {
+                      final data = value[index];
+                      return Column(
+                        children: [
+                          Padding(
+                            padding: const EdgeInsets.all(8.0),
+                            child: Text('${index + 1} - ${data.displayTime}'),
+                          ),
+                        ],
+                      );
+                    });
+                }
+              ),
+            ),
+            StreamBuilder<int>(
+                stream: _stopWatchTimer.rawTime,
+                initialData: _stopWatchTimer.rawTime.value,
+                builder: (context, snapshot) {
+              final value = snapshot.data;
+              final displayTime = StopWatchTimer.getDisplayTime(value, hours: _isHours);
+              return Text(displayTime, style: TextStyle(
+                fontWeight: FontWeight.bold,
+                color: Colors.blue.shade900,
+                fontSize: 52,
+              ),);
+            }),
             const SizedBox(height: 30,),
             buildButtons(),
           ],
@@ -90,100 +110,52 @@ class _TimerScreenState extends State<TimerScreen>{
     );
   }
 
-  Widget buildTime() {
-    String twoDigits(int n) => n.toString().padLeft(2,'0');
-    final minutes = twoDigits(duration.inMinutes.remainder(60));
-    final seconds = twoDigits(duration.inSeconds.remainder(60));
-    final hours = twoDigits(duration.inHours.remainder(60));
-
-    /*
-    return Text(
-      '$minutes:$seconds',
-      style: TextStyle(fontSize: 80),
-    );
-     */
+  Widget buildButtons() {
+    final isRunning = _stopWatchTimer.isRunning;
 
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
-        buildTimeCard(time: hours, header: 'Hours'),
-        const SizedBox(width: 5),
-        buildTimeCard(time: minutes, header: 'Minutes'),
-        const SizedBox(width: 5),
-        buildTimeCard(time: seconds, header: 'Seconds'),
-      ],
-    );
-  }
-
-  Widget buildTimeCard({String time, String header}) {
-    return Column(
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: <Widget>[
-        Container(
-          padding: EdgeInsets.all(8),
-          decoration: BoxDecoration(
-              color: Colors.blue.shade900,
-              borderRadius: BorderRadius.circular(15)
-          ),
-          child: Text(
-            time,
-            style: TextStyle(
-              fontWeight: FontWeight.bold,
-              color: Colors.white,
-              fontSize: 72,
-            ),
-          ),
-        ),
-        const SizedBox(height: 20),
-        Text(header)
-      ],
-    );
-  }
-
-  Widget buildButtons() {
-    final isRunning = timer == null ? false : timer.isActive;
-    final isCompleted = duration.inSeconds == 0;
-
-    return isRunning || !isCompleted ?
-    Row(
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: [
         ElevatedButton(
             style: ElevatedButton.styleFrom(
-                primary: Colors.blue.shade900,
+                backgroundColor: Colors.blue.shade900,
                 padding: EdgeInsets.symmetric(horizontal: 32, vertical: 16)
             ),
-            child: Text(isRunning ? "Stop":"Resume",style: TextStyle(color: Colors.white)),
+            child: Text("Lap",style: TextStyle(color: Colors.white)),
             onPressed: () {
-              if (isRunning) {
-                stopTimer(resets: false);
-              } else {
-                startTimer(resets: false);
-              }
+              setState(() {
+                lapTime();
+              });
             }
+        ),
+        const SizedBox(width: 10.0,),
+        FloatingActionButton(
+          backgroundColor: Colors.blue.shade900,
+          child: isRunning ? Icon(Icons.pause,color: Colors.white) : Icon(Icons.play_arrow,color: Colors.white),
+          onPressed: () {
+            setState(() {
+              if (isRunning) {
+                stopTimer();
+              } else {
+                startTimer();
+              }
+            });
+          }
         ),
         const SizedBox(width: 10.0,),
         ElevatedButton(
             style: ElevatedButton.styleFrom(
-                primary: Colors.blue.shade900,
+                backgroundColor: Colors.blue.shade900,
                 padding: EdgeInsets.symmetric(horizontal: 32, vertical: 16)
             ),
-            child: Text("Cancel",style: TextStyle(color: Colors.white)),
+            child: Text("Reset",style: TextStyle(color: Colors.white)),
             onPressed: () {
-              stopTimer(resets: true);
+              setState(() {
+                resetTimer();
+              });
             }
         ),
       ],
-    ):
-    ElevatedButton(
-        style: ElevatedButton.styleFrom(
-            primary: Colors.blue.shade900,
-            padding: EdgeInsets.symmetric(horizontal: 32, vertical: 16)
-        ),
-        child: Text("Start Timer",style: TextStyle(color: Colors.white)),
-        onPressed: () {
-          startTimer();
-        }
     );
   }
 
