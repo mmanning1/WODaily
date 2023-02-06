@@ -1,6 +1,7 @@
 
 import 'package:WODaily/model/user.dart';
 import 'package:WODaily/model/workout.dart';
+import 'package:WODaily/screens/tabata_screen.dart';
 import 'package:WODaily/screens/timer_screen.dart';
 import 'package:WODaily/services/auth.dart';
 import 'package:WODaily/services/database.dart';
@@ -60,7 +61,7 @@ class _WodHomeState extends State<WodHome> {
               icon: const Icon(FontAwesomeIcons.bars),
               onSelected: handleClick,
               itemBuilder: (BuildContext context) {
-                return {'Logout', 'Settings','Timer'}.map((String choice) {
+                return {'Logout', 'Settings','Stopwatch','Tabata'}.map((String choice) {
                   return PopupMenuItem<String>(
                     value: choice,
                     child: Text(choice),
@@ -405,9 +406,13 @@ class _WodHomeState extends State<WodHome> {
         break;
       case 'Settings':
         break;
-      case 'Timer':
+      case 'Stopwatch':
         Navigator.of(this.context).push(MaterialPageRoute(
             builder: (context) => TimerScreen()));
+        break;
+      case 'Tabata':
+        Navigator.of(this.context).push(MaterialPageRoute(
+            builder: (context) => TabataScreen()));
         break;
       case 'Search':
         break;
