@@ -44,4 +44,6 @@ ThemeData mainThemeData = ThemeData(
     )
 );
 
-const List<String> wodTypes = ['Select One','AMRAP','EMOM','Reps','For time','For weight','Chipper','Ladder','Tabata'];
+const List<String> wodTypes = ['Select One','AMRAP','EMOM','Reps','Rounds','For time','For weight','Chipper','Ladder','Tabata'];
+
+const bool useFirebase = false;

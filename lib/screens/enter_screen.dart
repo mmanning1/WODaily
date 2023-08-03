@@ -17,6 +17,8 @@ class EnterWodScreen extends StatefulWidget {
   String desc;
   String score;
 
+  EnterWodScreen({Key key, @required this.date}) : super(key: key);
+
   @override
   _EnterWodScreenState createState() => _EnterWodScreenState();
 }
@@ -58,7 +60,7 @@ class _EnterWodScreenState extends State<EnterWodScreen>{
                     const SizedBox(height: 15.0,),
                     TextFormField(
                       autofocus: false,
-                      //initialValue: DateFormat('MM/dd/yyyy').format(DateTime.now()),
+                      //initialValue: widget.date==null ? DateFormat('MM/dd/yyyy').format(DateTime.now()) : DateFormat('MM/dd/yyyy').format(widget.date),
                       controller: _dateController,
                       keyboardType: TextInputType.datetime,
                       onTap: () async {
@@ -184,22 +186,26 @@ class _EnterWodScreenState extends State<EnterWodScreen>{
   void initState() {
     super.initState();
     print('Creating new WOD');
-    _dateController.text = DateFormat('MM/dd/yy').format(DateTime.now());
+    //Will default the date from the calender's highlighted day, but not the list
+    _dateController.text = widget.date == null ? DateFormat('MM/dd/yy').format(DateTime.now()) : DateFormat('MM/dd/yyyy').format(widget.date);
 
   }
 
   void _save(int wodId,String date, String type, String desc, String score) async {
-    final user = Provider.of<WodUser>(context, listen: false);
-    Wod newWod = Wod(date: date, type: type, description: desc, score: score);
-
-    //firebase
-    await DatabaseService().createWodData(newWod, user.uid);
-
-    //internal db
-    int savedItemId = await db.insertData(newWod);
-    // Don't need this now, might implement later
-    //Wod addedItem = await db.getSingleData(savedItemId);
-    print("Saved wod: " + newWod.toString() + " to DB: " + savedItemId.toString());
+    Wod newWod = null;
+    if (useFirebase){
+      //firebase db
+      newWod = Wod(date: date, type: type, description: desc, score: score);
+      final user = Provider.of<WodUser>(context, listen: false);
+      String fId = await DatabaseService().createWodData(newWod, user.uid);
+      print("Saved wod: " + newWod.toString() + " to firebase DB: " + fId);
+    } else {
+      //internal db - need to convert date
+      date = DateFormat('yyyy-MM-dd').format(DateFormat('MM/dd/yy').parse(date));
+      newWod = Wod(date: date, type: type, description: desc, score: score);
+      int savedItemId = await db.insertData(newWod);
+      print("Saved wod: " + newWod.toString() + " to local DB: " + savedItemId.toString());
+    }
     Navigator.pop(context, newWod);
   }
 

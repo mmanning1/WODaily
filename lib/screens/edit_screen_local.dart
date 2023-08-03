@@ -9,32 +9,39 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 
-class EditWodScreen extends StatefulWidget {
-  final QueryDocumentSnapshot<Object> workout;
+class EditWodScreenLocal extends StatefulWidget {
+  final Wod workout;
 
-  EditWodScreen({this.workout});
+  EditWodScreenLocal({this.workout});
 
   @override
-  _EditWodScreenState createState() => _EditWodScreenState(workout);
+  _EditWodScreenLocalState createState() => _EditWodScreenLocalState(workout);
 }
 
-class _EditWodScreenState extends State<EditWodScreen> {
-  QueryDocumentSnapshot<Object> workout;
+class _EditWodScreenLocalState extends State<EditWodScreenLocal> {
+  Wod workout;
+  int id;
   String type;
   String desc;
   String score;
   DateTime date;
   String _dropdownValue = 'Select One';
 
-  _EditWodScreenState(this.workout);
+  _EditWodScreenLocalState(this.workout);
 
   @override
   void initState() {
     super.initState();
-    _dateController.text=DateFormat('MM/dd/yy').format(workout['date'].toDate());
+    id=workout.id;
+    _dateController.text=DateFormat('MM/dd/yy').format(DateFormat('yyyy-MM-dd').parse(workout.date));
+    _dropdownValue = workout.type;
+    _descriptionController.text=workout.description;
+    _scoreController.text=workout.score;
+    /*_dateController.text=DateFormat('MM/dd/yy').format(workout['date'].toDate());
     _dropdownValue = workout['type'];
     _descriptionController.text=workout['description'];
     _scoreController.text=workout['score'];
+    */
   }
 
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
@@ -163,12 +170,13 @@ class _EditWodScreenState extends State<EditWodScreen> {
                                   color: Theme.of(context).primaryColor,
                                   child:Text("Update",style: TextStyle(color: Colors.white)) ,
                                   onPressed:(){
-                                    DatabaseService().updateWodData(workout.id,
+                                    /*DatabaseService().updateWodData(workout.id,
                                         _dateController.text,
                                         _descriptionController.text,
                                         _scoreController.text,
                                         _dropdownValue.toString(),
-                                        user.uid);
+                                        user.uid);*/
+                                    _update(workout);
                                     Navigator.pop(context);
                                   }
                               )
@@ -209,4 +217,16 @@ class _EditWodScreenState extends State<EditWodScreen> {
     }
   }
 
+  _update(Wod wod) async {
+    Wod updated = Wod.fromMap({
+      "date":_dateController.text,
+      "type":_dropdownValue,
+      "description":_descriptionController.text,
+      "score":_scoreController.text,
+      "id":wod.id
+    });
+    int savedItemId = await db.updateItem(updated);
+    print("Updated wod: " + updated.toString() + "to DB: " + savedItemId.toString());
+    Navigator.pop(context, updated);
+  }
 }
